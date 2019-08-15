@@ -13,7 +13,7 @@ sealed class TimeTicks(val value: Long) {
     /**
      * Amount of time.
      */
-    class TimeSpan(ticks: Long) : TimeTicks(ticks) {
+    class TimeSpan(ticks: Long) : TimeTicks(ticks), Comparable<TimeSpan> {
 
         fun toDuration(): Duration {
             val seconds = secondsFromTicks(value)
@@ -21,24 +21,55 @@ sealed class TimeTicks(val value: Long) {
             return Duration.ofSeconds(seconds, nanos)
         }
 
+        override fun compareTo(other: TimeSpan): Int {
+            return value.compareTo(other.value)
+        }
+
+        override fun equals(other: Any?): Boolean {
+            return other is TimeSpan && other.value == this.value
+        }
+
+        override fun hashCode(): Int {
+            return value.hashCode()
+        }
+
+        override fun toString() = "$value ticks (${toDuration()})"
+
     }
 
     /**
      * Point on the time-line.
      */
-    abstract class Timestamp internal constructor(ticks: Long) : TimeTicks(ticks) {
+    abstract class Timestamp internal constructor(ticks: Long) : TimeTicks(ticks), Comparable<Timestamp> {
 
         /**
-         * Count of ticks between reference time (zeroth tick) and Java epoch.
+         * Count of ticks between the reference time (at the zeroth tick) and Java epoch.
          */
         protected abstract val epochOffset: Long
 
+        private val epochTicks: Long
+            get() = Math.addExact(value, epochOffset)
+
         fun toInstant(): Instant {
-            val epochTicks = Math.addExact(value, epochOffset)
             val seconds = secondsFromTicks(epochTicks)
             val nanos = nanosFromTicks(epochTicks)
             return Instant.ofEpochSecond(seconds, nanos)
         }
+
+        final override fun compareTo(other: Timestamp): Int {
+            return epochTicks.compareTo(other.epochTicks)
+        }
+
+        final override fun equals(other: Any?): Boolean {
+            return other is Timestamp
+                && other.epochTicks == this.epochTicks
+        }
+
+        final override fun hashCode(): Int {
+            return epochTicks.hashCode()
+        }
+
+        final override fun toString() = "$value ticks (${toInstant()})"
 
     }
 
@@ -67,7 +98,7 @@ sealed class TimeTicks(val value: Long) {
     }
 
     /**
-     * Point on the time-line in format used by e.g. Hercules.
+     * Point on the time-line in format used by e.g. Vostok Hercules.
      *
      * Value represents count of 100-nanosecond intervals since Java epoch of 1970-01-01T00:00:00Z.
      */

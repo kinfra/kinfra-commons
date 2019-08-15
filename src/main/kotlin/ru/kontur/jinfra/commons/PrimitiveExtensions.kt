@@ -1,7 +1,7 @@
 package ru.kontur.jinfra.commons
 
 /**
- * If this boolean is true, calls specified [block] and returns its result.
+ * If this boolean is `true`, calls specified [block] and returns its result.
  * Otherwise just returns `null`.
  */
 inline fun <R> Boolean.thenTake(block: () -> R): R? = if (this) block() else null

@@ -133,7 +133,9 @@ fun Duration.toTicks(): TimeTicks.TimeSpan {
 }
 
 private fun ticksFromSeconds(seconds: Long, nanos: Int): Long {
-    return Math.multiplyExact(seconds, TICKS_PER_SECOND) + nanos / NANOS_PER_TICK
+    val secondsPart = Math.multiplyExact(seconds, TICKS_PER_SECOND)
+    val nanosPart = nanos / NANOS_PER_TICK
+    return Math.addExact(secondsPart, nanosPart)
 }
 
 private fun secondsFromTicks(ticks: Long): Long {
@@ -141,7 +143,7 @@ private fun secondsFromTicks(ticks: Long): Long {
 }
 
 private fun nanosFromTicks(ticks: Long): Long {
-    return Math.multiplyExact(ticks % TICKS_PER_SECOND, NANOS_PER_TICK)
+    return (ticks % TICKS_PER_SECOND) * NANOS_PER_TICK
 }
 
 private const val NANOS_PER_TICK = 100L

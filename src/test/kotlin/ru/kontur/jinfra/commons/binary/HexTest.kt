@@ -17,16 +17,16 @@ class HexTest {
 
     @Test
     fun appendHexByte_samples() {
-        assertAll(
-            samples.map { (input, expected) ->
-                fun(): Unit {
-                    val result = buildString {
-                        appendHexByte(input.toByte())
-                    }
-                    assertEquals(expected, result)
-                }
+        val input = samples.keys.map { it.toByte() }.toByteArray()
+        val expected = samples.values.joinToString(separator = "")
+
+        val output = buildString {
+            for (byte in input) {
+                appendHexByte(byte)
             }
-        )
+        }
+
+        assertEquals(expected, output)
     }
 
     @Test
@@ -39,6 +39,16 @@ class HexTest {
                 }
             }
         )
+    }
+
+    @Test
+    fun byteArray_toHexString_samples() {
+        val input = samples.keys.map { it.toByte() }.toByteArray()
+        val expected = samples.values.joinToString(separator = "")
+
+        val output = input.toHexString()
+
+        assertEquals(expected, output)
     }
 
 }

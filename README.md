@@ -26,6 +26,12 @@ jinfra-commons
 
 Возвращает `Instant`, соответствующий полю `timestamp` UUID версии 4 (time-based).
 
+### Работа с `enum class`
+
+### Enum.lowerCaseName
+
+Возвращает название константы `enum` в нижнем регистре.
+
 ### Работа со временем
 
 #### Класс MonotonicInstant

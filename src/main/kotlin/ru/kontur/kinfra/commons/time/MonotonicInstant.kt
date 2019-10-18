@@ -1,4 +1,4 @@
-package ru.kontur.jinfra.commons.time
+package ru.kontur.kinfra.commons.time
 
 import java.time.Duration
 import kotlin.time.*

@@ -1,4 +1,4 @@
-package ru.kontur.jinfra.commons.binary
+package ru.kontur.kinfra.commons.binary
 
 /**
  * Returns numeric value of this byte treating it as unsigned.

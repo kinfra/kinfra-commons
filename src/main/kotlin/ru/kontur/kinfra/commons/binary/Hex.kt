@@ -1,4 +1,4 @@
-package ru.kontur.jinfra.commons.binary
+package ru.kontur.kinfra.commons.binary
 
 private val hexDigits = "0123456789abcdef".toCharArray()
 

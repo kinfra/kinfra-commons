@@ -1,6 +1,6 @@
-package ru.kontur.jinfra.commons
+package ru.kontur.kinfra.commons
 
-import ru.kontur.jinfra.commons.time.TimeTicks
+import ru.kontur.kinfra.commons.time.TimeTicks
 import java.time.Instant
 import java.util.*
 

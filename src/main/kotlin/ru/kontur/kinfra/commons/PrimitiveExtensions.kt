@@ -1,4 +1,4 @@
-package ru.kontur.jinfra.commons
+package ru.kontur.kinfra.commons
 
 /**
  * If this boolean is `true`, calls specified [block] and returns its result.

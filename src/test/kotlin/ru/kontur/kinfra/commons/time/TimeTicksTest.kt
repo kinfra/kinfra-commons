@@ -1,4 +1,4 @@
-package ru.kontur.jinfra.commons.time
+package ru.kontur.kinfra.commons.time
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.GenericComparableAssert
@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import ru.kontur.jinfra.commons.time.TimeTicks.*
+import ru.kontur.kinfra.commons.time.TimeTicks.*
 import java.time.*
 import java.time.temporal.ChronoUnit
 import java.util.*

@@ -1,4 +1,4 @@
-package ru.kontur.jinfra.commons.binary
+package ru.kontur.kinfra.commons.binary
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

@@ -1,4 +1,4 @@
-package ru.kontur.jinfra.commons
+package ru.kontur.kinfra.commons
 
 import java.util.*
 

@@ -71,10 +71,10 @@ kinfra-commons
 
 Беззнаковое представление 16 бит из `Short`
 
-#### Конвертация в шестнадцатеричное представление
+#### Конвертация в шестнадцатеричное представление и обратно
 
  * `Byte.toHexString()`
- * `ByteArray.toHexString()`
+ * `ByteArray.toHexString()` и `byteArrayOfHex()`
  * `StringBuilder.appendHexByte()`
 
 ## Сборка

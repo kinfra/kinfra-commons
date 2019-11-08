@@ -1,8 +1,10 @@
 package ru.kontur.kinfra.commons.binary
 
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertAll
+import org.junit.jupiter.api.assertThrows
 
 class HexTest {
 
@@ -36,6 +38,33 @@ class HexTest {
                 fun(): Unit {
                     val result = input.toByte().toHexString()
                     assertEquals(expected, result)
+                }
+            }
+        )
+    }
+
+    @Test
+    fun byteArrayOfHex_samples() {
+        val input = samples.values.joinToString(separator = "")
+        val expected = samples.keys.map { it.toByte() }.toByteArray()
+        val result = byteArrayOfHex(input)
+        assertArrayEquals(expected, result)
+    }
+
+    @Test
+    fun byteArrayOfHex_reject_odd_length_string() {
+        assertThrows<IllegalArgumentException> {
+            byteArrayOfHex("123")
+        }
+    }
+
+    @Test
+    fun byteArrayOfHex_single_samples() {
+        assertAll(
+            samples.map { (expected, input) ->
+                fun(): Unit {
+                    val result = byteArrayOfHex(input)
+                    assertArrayEquals(byteArrayOf(expected.toByte()), result)
                 }
             }
         )

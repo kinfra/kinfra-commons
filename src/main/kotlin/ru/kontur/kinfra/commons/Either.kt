@@ -1,5 +1,7 @@
 package ru.kontur.kinfra.commons
 
+import ru.kontur.kinfra.commons.Either.Companion.left
+import ru.kontur.kinfra.commons.Either.Companion.right
 import ru.kontur.kinfra.commons.Either.Left
 import ru.kontur.kinfra.commons.Either.Right
 
@@ -15,9 +17,9 @@ sealed class Either<out L, out R> {
     // - Arrow's Either
     // - kotlin.Result
 
-    data class Left<out L>(val error: L) : Either<L, Nothing>()
+    data class Left<out L> internal constructor(val error: L) : Either<L, Nothing>()
 
-    data class Right<out R>(val value: R) : Either<Nothing, R>()
+    data class Right<out R> internal constructor(val value: R) : Either<Nothing, R>()
 
     inline fun <T> fold(onFailure: (L) -> T, onSuccess: (R) -> T): T = when (this) {
         is Left -> onFailure(error)
@@ -25,8 +27,14 @@ sealed class Either<out L, out R> {
     }
 
     companion object {
+
         fun <L> left(error: L): Either<L, Nothing> = Left(error)
+
+        @Deprecated(level = DeprecationLevel.ERROR, message = "Don't use Either for exceptions")
+        fun <E> left(error: E): Either<E, Nothing> where E : Throwable = Left(error)
+
         fun <R> right(value: R): Either<Nothing, R> = Right(value)
+
     }
 
 }
@@ -40,13 +48,13 @@ val <L, R> Either<L, R>.isRight: Boolean
 fun <L, R> Either<L, R>.leftOrNull(): L? = fold({ it }, { null })
 
 inline fun <L, R, T> Either<L, R>.mapLeft(transform: (L) -> T): Either<T, R> = when (this) {
-    is Left -> Left(transform(error))
+    is Left -> left(transform(error))
     is Right -> this
 }
 
 inline fun <L, R, T> Either<L, R>.map(transform: (R) -> T): Either<L, T> = when (this) {
     is Left -> this
-    is Right -> Right(transform(value))
+    is Right -> right(transform(value))
 }
 
 inline fun <L, R, T> Either<L, R>.flatMap(transform: (R) -> Either<L, T>): Either<L, T> = when (this) {

@@ -147,9 +147,9 @@ class EitherTest {
     )
 
     @TestFactory
-    fun recover() = testBoth(
+    fun getOrElse() = testBoth(
         { input ->
-            val result = input.recover { error ->
+            val result = input.getOrElse { error ->
                 assertEquals("error", error)
                 "fallback"
             }
@@ -157,7 +157,7 @@ class EitherTest {
             assertEquals("fallback", result)
         },
         { input ->
-            val result = input.recover {
+            val result = input.getOrElse {
                 error("should not be called")
             }
 

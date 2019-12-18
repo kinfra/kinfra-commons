@@ -39,8 +39,6 @@ val <L, R> Either<L, R>.isRight: Boolean
 
 fun <L, R> Either<L, R>.leftOrNull(): L? = fold({ it }, { null })
 
-fun <L, R> Either<L, R>.getOrNull(): R? = fold({ null }, { it })
-
 inline fun <L, R, T> Either<L, R>.mapLeft(transform: (L) -> T): Either<T, R> = when (this) {
     is Left -> Left(transform(error))
     is Right -> this
@@ -51,20 +49,22 @@ inline fun <L, R, T> Either<L, R>.map(transform: (R) -> T): Either<L, T> = when 
     is Right -> Right(transform(value))
 }
 
-inline fun <R, L, T> Either<L, R>.flatMap(transform: (R) -> Either<L, T>): Either<L, T> = when (this) {
+inline fun <L, R, T> Either<L, R>.flatMap(transform: (R) -> Either<L, T>): Either<L, T> = when (this) {
     is Left -> this
     is Right -> transform(value)
 }
 
-fun <L, R> Either<L, R>.ensureSuccess(): R = fold(
-    { throw IllegalStateException("Result is error: $it") },
-    { it }
-)
+fun <R> Either<*, R>.getOrNull(): R? = getOrDefault(null)
 
-fun <R : T, T> Either<*, R>.getOrDefault(default: T): T = fold({ default }, { it })
+fun <R> Either<*, R>.getOrDefault(default: R): R = getOrElse { default }
 
-// todo: should it be named "getOrElse"?
-inline fun <L, T, R : T> Either<L, R>.recover(transform: (L) -> T): T = when (this) {
+inline fun <L, R> Either<L, R>.getOrThrow(exceptionSource: (L) -> Exception): R {
+    return getOrElse { throw exceptionSource(it) }
+}
+
+inline fun <L, R> Either<L, R>.getOrElse(transform: (L) -> R): R = when (this) {
     is Left -> transform(error)
     is Right -> value
 }
+
+fun <R> Either<*, R>.ensureSuccess(): R = getOrThrow { IllegalStateException("Result is error: $it") }

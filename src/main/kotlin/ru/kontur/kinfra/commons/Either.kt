@@ -30,9 +30,6 @@ sealed class Either<out L, out R> {
 
         fun <L> left(error: L): Either<L, Nothing> = Left(error)
 
-        @Deprecated(level = DeprecationLevel.ERROR, message = "Don't use Either for exceptions")
-        fun <E> left(error: E): Either<E, Nothing> where E : Throwable = Left(error)
-
         fun <R> right(value: R): Either<Nothing, R> = Right(value)
 
     }

@@ -39,6 +39,19 @@ kinfra-commons
 
 Аналог `Instant` на основе `System.nanoTime()` для измерения прошедшего времени.
 
+#### Класс Deadline
+
+Предназначен для передачи в вызываемый код информации о том, когда истечёт таймаут его выполнения.
+
+Для корректной работы этого механизма необходимо использовать функцию `withDeadlineAfter()` вместо `withTimeout()`.
+
+Пример использования:
+
+    withDeadlineAfter(Duration.ofSeconds(10)) {
+        ....
+        println("Time left: " + coroutineContext[Deadline]?.timeLeft())
+    }
+
 #### Класс TimeTicks
 
 Представляет время в тиках (100 наносекунд)
@@ -78,10 +91,9 @@ kinfra-commons
  * `ByteArray.toHexString()` и `byteArrayOfHex()`
  * `StringBuilder.appendHexByte()`
 
-### Either
+### Either<L, R>
 
-Библиотека предоставляет класс Either для представления выбора между ошибочным состоянием
-и успешным получением результата.
+Представляет выбор между ошибочным состоянием (L) и успешным получением результата (R).
 
 Сборка
 ------

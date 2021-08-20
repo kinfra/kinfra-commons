@@ -23,9 +23,19 @@ kinfra-commons
 
 Более безопасная альтернатива `Optional.orElse(null)`: возвращаемый тип - `T?`, а не `T!`.
 
+### Работа с time-based UUID
+
+#### generateTimeBasedUuid()
+
+Создаёт новый time-based UUID.
+
+#### UUID.isTimeBased
+
+Определяет, является ли данный UUID time-based (версии 1).
+
 #### UUID.instant()
 
-Возвращает `Instant`, соответствующий полю `timestamp` UUID версии 4 (time-based).
+Возвращает `Instant`, соответствующий полю `timestamp`.
 
 ### Работа с `enum class`
 

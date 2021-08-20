@@ -1,6 +1,5 @@
 package ru.kontur.kinfra.commons
 
-import ru.kontur.kinfra.commons.time.TimeTicks
 import java.time.Instant
 import java.util.*
 
@@ -11,12 +10,8 @@ import java.util.*
  */
 fun <T> Optional<T>.unwrap(): T? = orElse(null)
 
-/**
- * Return timestamp of this time-based (version 1) UUID as an [Instant].
- *
- * @throws UnsupportedOperationException if this UUID is not time-based
- * @see UUID.timestamp
- */
-fun UUID.instant(): Instant {
-    return TimeTicks.UuidTimestamp(timestamp()).toInstant()
+@Deprecated(message = "for compatibility", level = DeprecationLevel.HIDDEN)
+@JvmName("instant")
+fun UUID.instantCompatibilityBridge(): Instant {
+    return instant()
 }

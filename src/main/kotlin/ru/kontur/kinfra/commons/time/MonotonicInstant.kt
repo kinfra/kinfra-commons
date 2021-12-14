@@ -27,8 +27,12 @@ public class MonotonicInstant private constructor(
         return Duration.ofNanos(nanoOffset - other.nanoOffset)
     }
 
+    public fun elapsedNow(): Duration {
+        return Duration.ofNanos(nowNanos() - nanoOffset)
+    }
+
     override fun compareTo(other: MonotonicInstant): Int {
-        // implies that nanoOffset is monotonic
+        // implies that nanoOffset is monotonic, that is it cannot overflow
         return nanoOffset.compareTo(other.nanoOffset)
     }
 
@@ -49,7 +53,12 @@ public class MonotonicInstant private constructor(
         private val ORIGIN_NANOS = rawNow()
 
         public fun now(): MonotonicInstant {
-            return MonotonicInstant(rawNow() - ORIGIN_NANOS)
+            return MonotonicInstant(nowNanos())
+        }
+
+        private fun nowNanos(): Long {
+            // raw value is not used for correctness of compareTo()
+            return rawNow() - ORIGIN_NANOS
         }
 
         private fun rawNow(): Long {

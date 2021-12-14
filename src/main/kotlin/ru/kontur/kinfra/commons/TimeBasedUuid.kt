@@ -13,7 +13,7 @@ import kotlin.random.Random
 /**
  * Determines if this UUID is time-based (version 1)
  */
-val UUID.isTimeBased: Boolean
+public val UUID.isTimeBased: Boolean
     get() = version() == 1
 
 /**
@@ -22,14 +22,14 @@ val UUID.isTimeBased: Boolean
  * @throws UnsupportedOperationException if this UUID is not time-based
  * @see UUID.timestamp
  */
-fun UUID.instant(): Instant {
+public fun UUID.instant(): Instant {
     return TimeTicks.UuidTimestamp(timestamp()).toInstant()
 }
 
 /**
  * Creates a new time-based (version 1) UUID.
  */
-fun generateTimeBasedUuid(): UUID {
+public fun generateTimeBasedUuid(): UUID {
     return TimeBasedUuidGenerator.generate()
 }
 

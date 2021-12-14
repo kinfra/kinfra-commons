@@ -9,13 +9,13 @@ import kotlin.reflect.KClass
  * @param L type of "plain" ("decoded") object
  * @param R type of "encoded" object
  */
-interface Encoding<L, R> {
+public interface Encoding<L, R> {
 
-    fun encode(value: L): R
+    public fun encode(value: L): R
 
-    fun decode(value: R): L
+    public fun decode(value: R): L
 
-    companion object {
+    public companion object {
 
         /**
          * Creates an encoding for an [Enum] using an [encoding function][encoder].
@@ -25,11 +25,11 @@ interface Encoding<L, R> {
          *
          * @throws IllegalStateException if there are duplicate mappings
          */
-        inline fun <reified L : Enum<L>, R> enum(noinline encoder: (L) -> R): Encoding<L, R> {
+        public inline fun <reified L : Enum<L>, R> enum(noinline encoder: (L) -> R): Encoding<L, R> {
             return enum(L::class, encoder)
         }
 
-        fun <E : Enum<E>, T> enum(enumClass: KClass<E>, encoder: (E) -> T): Encoding<E, T> {
+        public fun <E : Enum<E>, T> enum(enumClass: KClass<E>, encoder: (E) -> T): Encoding<E, T> {
             val values = enumClass.java.enumConstants
             val directMapping = EnumMap<E, T>(enumClass.java)
             val reverseMapping = mutableMapOf<T, E>()
@@ -51,14 +51,14 @@ interface Encoding<L, R> {
          *
          * @throws IllegalStateException if there are duplicate or missing mappings
          */
-        inline fun <reified L : Enum<L>, reified R : Enum<R>> enumBijection(
+        public inline fun <reified L : Enum<L>, reified R : Enum<R>> enumBijection(
             noinline mapper: (L) -> R
         ): Encoding<L, R> {
 
             return enumBijection(L::class, R::class, mapper)
         }
 
-        fun <L : Enum<L>, R : Enum<R>> enumBijection(
+        public fun <L : Enum<L>, R : Enum<R>> enumBijection(
             leftEnumClass: KClass<L>,
             rightEnumClass: KClass<R>,
             mapper: (L) -> R
@@ -89,11 +89,11 @@ interface Encoding<L, R> {
          *
          * @throws IllegalStateException if constants of the enum classes are named differently
          */
-        inline fun <reified L : Enum<L>, reified R : Enum<R>> enumBijectionByName(): Encoding<L, R> {
+        public inline fun <reified L : Enum<L>, reified R : Enum<R>> enumBijectionByName(): Encoding<L, R> {
             return enumBijectionByName(L::class, R::class)
         }
 
-        fun <L : Enum<L>, R : Enum<R>> enumBijectionByName(
+        public fun <L : Enum<L>, R : Enum<R>> enumBijectionByName(
             leftClass: KClass<L>,
             rightClass: KClass<R>
         ): Encoding<L, R> {

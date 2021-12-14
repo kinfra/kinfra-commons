@@ -21,3 +21,7 @@ dependencies {
 
     testImplementation "org.assertj:assertj-core:${versions.assertj}"
 }
+
+kotlin {
+    explicitApi()
+}

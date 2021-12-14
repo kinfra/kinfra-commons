@@ -8,22 +8,22 @@ import kotlin.time.*
  *
  * Backed by [System.nanoTime].
  *
- * To be replaced by [ClockMark] of [MonoClock] after its final release.
+ * To be replaced by [TimeMark] of [MonotonicTimeSource] after its final release.
  */
-class MonotonicInstant private constructor(
+public class MonotonicInstant private constructor(
     private val nanoOffset: Long
 ) : Comparable<MonotonicInstant> {
     // todo: deprecate after release of kotlin.time
 
-    operator fun plus(duration: Duration): MonotonicInstant {
+    public operator fun plus(duration: Duration): MonotonicInstant {
         return MonotonicInstant(nanoOffset + duration.toNanos())
     }
 
-    operator fun minus(duration: Duration): MonotonicInstant {
+    public operator fun minus(duration: Duration): MonotonicInstant {
         return MonotonicInstant(nanoOffset - duration.toNanos())
     }
 
-    operator fun minus(other: MonotonicInstant): Duration {
+    public operator fun minus(other: MonotonicInstant): Duration {
         return Duration.ofNanos(nanoOffset - other.nanoOffset)
     }
 
@@ -44,11 +44,11 @@ class MonotonicInstant private constructor(
         return "MonotonicInstant(${Duration.ofSeconds(0, nanoOffset)} since origin)"
     }
 
-    companion object {
+    public companion object {
 
         private val ORIGIN_NANOS = rawNow()
 
-        fun now(): MonotonicInstant {
+        public fun now(): MonotonicInstant {
             return MonotonicInstant(rawNow() - ORIGIN_NANOS)
         }
 

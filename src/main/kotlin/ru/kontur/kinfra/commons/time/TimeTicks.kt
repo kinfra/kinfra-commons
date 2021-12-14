@@ -8,14 +8,14 @@ import java.util.concurrent.TimeUnit
  *
  * @property value count of ticks (100-nanosecond intervals)
  */
-sealed class TimeTicks(val value: Long) {
+public sealed class TimeTicks(public val value: Long) {
 
     /**
      * Amount of time.
      */
-    class TimeSpan(ticks: Long) : TimeTicks(ticks), Comparable<TimeSpan> {
+    public class TimeSpan(ticks: Long) : TimeTicks(ticks), Comparable<TimeSpan> {
 
-        fun toDuration(): Duration {
+        public fun toDuration(): Duration {
             val seconds = secondsFromTicks(value)
             val nanos = nanosFromTicks(value)
             return Duration.ofSeconds(seconds, nanos)
@@ -33,14 +33,14 @@ sealed class TimeTicks(val value: Long) {
             return value.hashCode()
         }
 
-        override fun toString() = "$value ticks (${toDuration()})"
+        override fun toString(): String = "$value ticks (${toDuration()})"
 
     }
 
     /**
      * Point on the time-line.
      */
-    abstract class Timestamp internal constructor(ticks: Long) : TimeTicks(ticks), Comparable<Timestamp> {
+    public abstract class Timestamp internal constructor(ticks: Long) : TimeTicks(ticks), Comparable<Timestamp> {
 
         /**
          * Count of ticks between the reference time (at the zeroth tick) and Java epoch.
@@ -50,7 +50,7 @@ sealed class TimeTicks(val value: Long) {
         private val epochTicks: Long
             get() = Math.addExact(value, epochOffset)
 
-        fun toInstant(): Instant {
+        public fun toInstant(): Instant {
             val seconds = secondsFromTicks(epochTicks)
             val nanos = nanosFromTicks(epochTicks)
             return Instant.ofEpochSecond(seconds, nanos)
@@ -69,7 +69,7 @@ sealed class TimeTicks(val value: Long) {
             return epochTicks.hashCode()
         }
 
-        final override fun toString() = "$value ticks (${toInstant()})"
+        final override fun toString(): String = "$value ticks (${toInstant()})"
 
     }
 
@@ -80,7 +80,7 @@ sealed class TimeTicks(val value: Long) {
      *
      * See more at [https://msdn.microsoft.com/en-us/library/system.datetime.ticks.aspx].
      */
-    class DotNetTimestamp(ticks: Long) : Timestamp(ticks) {
+    public class DotNetTimestamp(ticks: Long) : Timestamp(ticks) {
 
         override val epochOffset: Long get() = DOT_NET_EPOCH_OFFSET
 
@@ -91,7 +91,7 @@ sealed class TimeTicks(val value: Long) {
      *
      * Value represents count of 100-nanosecond intervals since midnight, October 15, 1582 UTC.
      */
-    class UuidTimestamp(ticks: Long) : Timestamp(ticks) {
+    public class UuidTimestamp(ticks: Long) : Timestamp(ticks) {
 
         override val epochOffset: Long get() = UUID_EPOCH_OFFSET
 
@@ -102,7 +102,7 @@ sealed class TimeTicks(val value: Long) {
      *
      * Value represents count of 100-nanosecond intervals since Java epoch of 1970-01-01T00:00:00Z.
      */
-    class EpochTimestamp(ticks: Long) : Timestamp(ticks) {
+    public class EpochTimestamp(ticks: Long) : Timestamp(ticks) {
 
         override val epochOffset: Long get() = 0
 
@@ -110,15 +110,15 @@ sealed class TimeTicks(val value: Long) {
 
 }
 
-fun Instant.toDotNetTime(): TimeTicks.DotNetTimestamp {
+public fun Instant.toDotNetTime(): TimeTicks.DotNetTimestamp {
     return TimeTicks.DotNetTimestamp(toTicks(DOT_NET_EPOCH_OFFSET))
 }
 
-fun Instant.toUuidTime(): TimeTicks.UuidTimestamp {
+public fun Instant.toUuidTime(): TimeTicks.UuidTimestamp {
     return TimeTicks.UuidTimestamp(toTicks(UUID_EPOCH_OFFSET))
 }
 
-fun Instant.toEpochTicks(): TimeTicks.EpochTimestamp {
+public fun Instant.toEpochTicks(): TimeTicks.EpochTimestamp {
     return TimeTicks.EpochTimestamp(toTicks(0))
 }
 
@@ -127,7 +127,7 @@ private fun Instant.toTicks(epochOffset: Long): Long {
     return Math.subtractExact(epochTicks, epochOffset)
 }
 
-fun Duration.toTicks(): TimeTicks.TimeSpan {
+public fun Duration.toTicks(): TimeTicks.TimeSpan {
     val ticks = ticksFromSeconds(seconds, nano)
     return TimeTicks.TimeSpan(ticks)
 }

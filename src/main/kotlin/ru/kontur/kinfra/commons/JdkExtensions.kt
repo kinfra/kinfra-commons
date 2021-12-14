@@ -8,10 +8,10 @@ import java.util.*
  *
  * This method is safer alternative to `orElse(null)`, whose return type is `T!`.
  */
-fun <T> Optional<T>.unwrap(): T? = orElse(null)
+public fun <T> Optional<T>.unwrap(): T? = orElse(null)
 
 @Deprecated(message = "for compatibility", level = DeprecationLevel.HIDDEN)
 @JvmName("instant")
-fun UUID.instantCompatibilityBridge(): Instant {
+public fun UUID.instantCompatibilityBridge(): Instant {
     return instant()
 }

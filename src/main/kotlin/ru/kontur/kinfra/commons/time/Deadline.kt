@@ -39,25 +39,25 @@ import kotlin.coroutines.coroutineContext
  *      }
  *      ```
  */
-class Deadline private constructor(
+public class Deadline private constructor(
     private val time: MonotonicInstant
 ) : CoroutineContext.Element, Comparable<Deadline> {
 
-    fun isPassed(): Boolean = timeLeft() <= Duration.ZERO
+    public fun isPassed(): Boolean = timeLeft() <= Duration.ZERO
 
     /**
      * Returns an amount of time before this deadline will [pass][isPassed].
      *
      * Negative values represent the time elapsed since this deadline is passed.
      */
-    fun timeLeft(): Duration {
+    public fun timeLeft(): Duration {
         // Result is truncated because withTimeout's precision is a millisecond
         return (time - now()).truncatedTo(ChronoUnit.MILLIS)
     }
 
-    operator fun plus(offset: Duration) = Deadline(time + offset)
+    public operator fun plus(offset: Duration): Deadline = Deadline(time + offset)
 
-    operator fun minus(offset: Duration) = Deadline(time - offset)
+    public operator fun minus(offset: Duration): Deadline = Deadline(time - offset)
 
     override fun compareTo(other: Deadline): Int {
         return time.compareTo(other.time)
@@ -78,14 +78,14 @@ class Deadline private constructor(
         return "Deadline($time)"
     }
 
-    companion object : CoroutineContext.Key<Deadline> {
+    public companion object : CoroutineContext.Key<Deadline> {
 
         /**
          * Returns a [Deadline] that passes after given [timeout] from now.
          *
          * The timeout **must** be positive.
          */
-        fun after(timeout: Duration): Deadline {
+        public fun after(timeout: Duration): Deadline {
             require(timeout > Duration.ZERO) { "Timeout must be positive: $timeout" }
             return Deadline(now() + timeout)
         }
@@ -100,7 +100,7 @@ class Deadline private constructor(
  *
  * If current deadline is less than the specified one, it will be used instead.
  */
-suspend fun <R> withDeadline(deadline: Deadline, block: suspend CoroutineScope.() -> R): R {
+public suspend fun <R> withDeadline(deadline: Deadline, block: suspend CoroutineScope.() -> R): R {
     val currentDeadline = coroutineContext[Deadline]
     val newDeadline = currentDeadline
         ?.let { minOf(it, deadline) }
@@ -117,7 +117,7 @@ suspend fun <R> withDeadline(deadline: Deadline, block: suspend CoroutineScope.(
  * @see withDeadline
  * @see Deadline.after
  */
-suspend fun <R> withDeadlineAfter(timeout: Duration, block: suspend CoroutineScope.() -> R): R {
+public suspend fun <R> withDeadlineAfter(timeout: Duration, block: suspend CoroutineScope.() -> R): R {
     val deadline = Deadline.after(timeout)
     return withDeadline(deadline, block)
 }

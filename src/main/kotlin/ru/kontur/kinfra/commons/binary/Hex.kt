@@ -6,7 +6,7 @@ private val hexDigitsUpper = "0123456789ABCDEF".toCharArray()
 /**
  * Returns this byte in form of two hexadecimal digits.
  */
-fun Byte.toHexString(upperCase: Boolean = false): String {
+public fun Byte.toHexString(upperCase: Boolean = false): String {
     val unsigned = asUnsigned()
     val hexDigits = if (upperCase) hexDigitsUpper else hexDigitsLower
     val chars = CharArray(2)
@@ -16,7 +16,7 @@ fun Byte.toHexString(upperCase: Boolean = false): String {
 }
 
 @Deprecated(message = "for compatibility", level = DeprecationLevel.HIDDEN)
-fun Byte.toHexString(): String {
+public fun Byte.toHexString(): String {
     return toHexString(upperCase = false)
 }
 
@@ -25,14 +25,14 @@ fun Byte.toHexString(): String {
  *
  * Inverse transformation is possible with [byteArrayOfHex].
  */
-fun ByteArray.toHexString(upperCase: Boolean = false): String = buildString(size * 2) {
+public fun ByteArray.toHexString(upperCase: Boolean = false): String = buildString(size * 2) {
     for (byte in this@toHexString) {
         appendHexByte(byte, upperCase)
     }
 }
 
 @Deprecated(message = "for compatibility", level = DeprecationLevel.HIDDEN)
-fun ByteArray.toHexString(): String {
+public fun ByteArray.toHexString(): String {
     return toHexString(upperCase = false)
 }
 
@@ -41,7 +41,7 @@ fun ByteArray.toHexString(): String {
  *
  * Inverse transformation is possible with [ByteArray.toHexString].
  */
-fun byteArrayOfHex(hex: String): ByteArray {
+public fun byteArrayOfHex(hex: String): ByteArray {
     require(hex.length % 2 == 0) {
         "Hex string must have even number of digits (actual is ${hex.length})"
     }
@@ -59,7 +59,7 @@ fun byteArrayOfHex(hex: String): ByteArray {
  * Append hexadecimal representation of a [byte] to this builder.
  * Exactly two hexadecimal digits are appended.
  */
-fun StringBuilder.appendHexByte(byte: Byte, upperCase: Boolean = false) {
+public fun StringBuilder.appendHexByte(byte: Byte, upperCase: Boolean = false) {
     val unsigned = byte.asUnsigned()
     val hexDigits = if (upperCase) hexDigitsUpper else hexDigitsLower
     append(hexDigits[unsigned shr 4])
@@ -67,6 +67,6 @@ fun StringBuilder.appendHexByte(byte: Byte, upperCase: Boolean = false) {
 }
 
 @Deprecated(message = "for compatibility", level = DeprecationLevel.HIDDEN)
-fun StringBuilder.appendHexByte(byte: Byte) {
+public fun StringBuilder.appendHexByte(byte: Byte) {
     appendHexByte(byte, upperCase = false)
 }

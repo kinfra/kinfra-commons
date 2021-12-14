@@ -8,27 +8,31 @@ import kotlin.time.*
  *
  * Backed by [System.nanoTime].
  *
- * To be replaced by [ClockMark] of [MonoClock] after its final release.
+ * To be replaced by [TimeMark] of [MonotonicTimeSource] after its final release.
  */
-class MonotonicInstant private constructor(
+public class MonotonicInstant private constructor(
     private val nanoOffset: Long
 ) : Comparable<MonotonicInstant> {
     // todo: deprecate after release of kotlin.time
 
-    operator fun plus(duration: Duration): MonotonicInstant {
+    public operator fun plus(duration: Duration): MonotonicInstant {
         return MonotonicInstant(nanoOffset + duration.toNanos())
     }
 
-    operator fun minus(duration: Duration): MonotonicInstant {
+    public operator fun minus(duration: Duration): MonotonicInstant {
         return MonotonicInstant(nanoOffset - duration.toNanos())
     }
 
-    operator fun minus(other: MonotonicInstant): Duration {
+    public operator fun minus(other: MonotonicInstant): Duration {
         return Duration.ofNanos(nanoOffset - other.nanoOffset)
     }
 
+    public fun elapsedNow(): Duration {
+        return Duration.ofNanos(nowNanos() - nanoOffset)
+    }
+
     override fun compareTo(other: MonotonicInstant): Int {
-        // implies that nanoOffset is monotonic
+        // implies that nanoOffset is monotonic, that is it cannot overflow
         return nanoOffset.compareTo(other.nanoOffset)
     }
 
@@ -44,12 +48,17 @@ class MonotonicInstant private constructor(
         return "MonotonicInstant(${Duration.ofSeconds(0, nanoOffset)} since origin)"
     }
 
-    companion object {
+    public companion object {
 
         private val ORIGIN_NANOS = rawNow()
 
-        fun now(): MonotonicInstant {
-            return MonotonicInstant(rawNow() - ORIGIN_NANOS)
+        public fun now(): MonotonicInstant {
+            return MonotonicInstant(nowNanos())
+        }
+
+        private fun nowNanos(): Long {
+            // raw value is not used for correctness of compareTo()
+            return rawNow() - ORIGIN_NANOS
         }
 
         private fun rawNow(): Long {

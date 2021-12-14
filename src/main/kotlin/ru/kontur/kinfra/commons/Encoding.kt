@@ -1,0 +1,129 @@
+package ru.kontur.kinfra.commons
+
+import java.util.*
+import kotlin.reflect.KClass
+
+/**
+ * Transforms an object to and from an alternative form.
+ *
+ * @param L type of "plain" ("decoded") object
+ * @param R type of "encoded" object
+ */
+interface Encoding<L, R> {
+
+    fun encode(value: L): R
+
+    fun decode(value: R): L
+
+    companion object {
+
+        /**
+         * Creates an encoding for an [Enum] using an [encoding function][encoder].
+         *
+         * The resulting encoding is not guaranteed to be bijective.
+         * Trying to [decode] an object without reverse mapping will lead to an [IllegalArgumentException].
+         *
+         * @throws IllegalStateException if there are duplicate mappings
+         */
+        inline fun <reified L : Enum<L>, R> enum(noinline encoder: (L) -> R): Encoding<L, R> {
+            return enum(L::class, encoder)
+        }
+
+        fun <E : Enum<E>, T> enum(enumClass: KClass<E>, encoder: (E) -> T): Encoding<E, T> {
+            val values = enumClass.java.enumConstants
+            val directMapping = EnumMap<E, T>(enumClass.java)
+            val reverseMapping = mutableMapOf<T, E>()
+            for (value in values) {
+                val code = encoder(value)
+                val existingCode = directMapping.put(value, code)
+                checkNotNull(existingCode == null)
+                val existingValue = reverseMapping.put(code, value)
+                check(existingValue == null) { "Duplicate mapping for $code: $existingValue and $value" }
+            }
+            return MappingEncoding(enumClass, directMapping, reverseMapping)
+        }
+
+        /**
+         * Creates a bijection between two [Enum] classes using a [mapping function][mapper].
+         *
+         * For each value of the [left][L] type the [mapper] must supply corresponding value of the [right][R] type.
+         * This way, each value of the right type must be mapped to a value of the left type without duplicates.
+         *
+         * @throws IllegalStateException if there are duplicate or missing mappings
+         */
+        inline fun <reified L : Enum<L>, reified R : Enum<R>> enumBijection(
+            noinline mapper: (L) -> R
+        ): Encoding<L, R> {
+
+            return enumBijection(L::class, R::class, mapper)
+        }
+
+        fun <L : Enum<L>, R : Enum<R>> enumBijection(
+            leftEnumClass: KClass<L>,
+            rightEnumClass: KClass<R>,
+            mapper: (L) -> R
+        ): Encoding<L, R> {
+
+            val leftValues = leftEnumClass.java.enumConstants.toSet()
+            val rightValues = rightEnumClass.java.enumConstants.toSet()
+            val directMapping = EnumMap<L, R>(leftEnumClass.java)
+            val reverseMapping = EnumMap<R, L>(rightEnumClass.java)
+            for (leftValue in leftValues) {
+                val rightValue = mapper(leftValue)
+                val existingRightValue = directMapping.put(leftValue, rightValue)
+                checkNotNull(existingRightValue == null)
+                val existingLeftValue = reverseMapping.put(rightValue, leftValue)
+                check(existingLeftValue == null) {
+                    "Duplicate mapping for $rightValue: $existingLeftValue and $leftValue"
+                }
+            }
+            val missingRightValues = (rightValues - reverseMapping.keys).map { it.name }
+            check(missingRightValues.isEmpty()) {
+                "No reverse mapping defined for values: $missingRightValues"
+            }
+            return MappingEncoding(leftEnumClass, directMapping, reverseMapping)
+        }
+
+        /**
+         * Creates a bijection between two [Enum] classes using constants' names for mapping.
+         *
+         * @throws IllegalStateException if constants of the enum classes are named differently
+         */
+        inline fun <reified L : Enum<L>, reified R : Enum<R>> enumBijectionByName(): Encoding<L, R> {
+            return enumBijectionByName(L::class, R::class)
+        }
+
+        fun <L : Enum<L>, R : Enum<R>> enumBijectionByName(
+            leftClass: KClass<L>,
+            rightClass: KClass<R>
+        ): Encoding<L, R> {
+
+            return enumBijection(leftClass, rightClass) {
+                val name = it.name
+                try {
+                    java.lang.Enum.valueOf(rightClass.java, name)
+                } catch (e: IllegalArgumentException) {
+                    throw IllegalStateException("Enum constant \"$name\" is missing in $rightClass")
+                }
+            }
+        }
+
+    }
+
+}
+
+private class MappingEncoding<E : Enum<E>, T>(
+    private val enumClass: KClass<E>,
+    private val directMapping: Map<E, T>,
+    private val reverseMapping: Map<T, E>,
+) : Encoding<E, T> {
+
+    override fun encode(value: E): T {
+        return directMapping.getValue(value)
+    }
+
+    override fun decode(value: T): E {
+        return requireNotNull(reverseMapping[value]) { "Unknown value for ${enumClass.simpleName}: $value" }
+    }
+
+}

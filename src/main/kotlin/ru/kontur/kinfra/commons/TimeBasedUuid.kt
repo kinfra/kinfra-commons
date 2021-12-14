@@ -8,6 +8,7 @@ import java.time.Duration
 import java.time.Instant
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
+import kotlin.random.Random
 
 /**
  * Determines if this UUID is time-based (version 1)
@@ -35,7 +36,7 @@ fun generateTimeBasedUuid(): UUID {
 internal object TimeBasedUuidGenerator {
     // See https://www.ietf.org/rfc/rfc4122.html
 
-    private val random = Random()
+    private val random = Random.Default
     private val timeSource = Clock.systemUTC()
     private val timestampAccuracy = Duration.ofMillis(1).toTicks().value
 

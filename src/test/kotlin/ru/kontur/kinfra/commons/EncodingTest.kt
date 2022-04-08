@@ -10,24 +10,37 @@ class EncodingTest {
     @Nested
     inner class EnumTest {
 
-        val sampleEncoding = Encoding.enum { it: SampleEnum -> it.value }
+        val nameEncoding = Encoding.enumByName<SampleEnum>()
+        val valueEncoding = Encoding.enum { it: SampleEnum -> it.value }
+
+        @Test
+        fun `encode name`() {
+            val result = nameEncoding.encode(SampleEnum.FOO)
+            assertThat(result).isEqualTo("FOO")
+        }
+
+        @Test
+        fun `decode name`() {
+            val result = nameEncoding.decode("BAR")
+            assertThat(result).isEqualTo(SampleEnum.BAR)
+        }
 
         @Test
         fun `encode sample value`() {
-            val result = sampleEncoding.encode(SampleEnum.FOO)
+            val result = valueEncoding.encode(SampleEnum.FOO)
             assertThat(result).isEqualTo(1)
         }
 
         @Test
         fun `decode sample value`() {
-            val result = sampleEncoding.decode(1)
+            val result = valueEncoding.decode(1)
             assertThat(result).isEqualTo(SampleEnum.FOO)
         }
 
         @Test
         fun `decode unknown value`() {
             assertThrows<IllegalArgumentException> {
-                sampleEncoding.decode(3)
+                valueEncoding.decode(3)
             }
         }
 

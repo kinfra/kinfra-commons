@@ -18,6 +18,14 @@ public interface Encoding<L, R> {
     public companion object {
 
         /**
+         * Returns an identity encoding: encoded and decoded form of values are identical.
+         */
+        public fun <T> identity(): Encoding<T, T> {
+            @Suppress("UNCHECKED_CAST")
+            return IdentityEncoding as Encoding<T, T>
+        }
+
+        /**
          * Creates an encoding for an [Enum] using an [encoding function][encoder].
          *
          * The resulting encoding is not guaranteed to be bijective.
@@ -41,6 +49,21 @@ public interface Encoding<L, R> {
                 check(existingValue == null) { "Duplicate mapping for $code: $existingValue and $value" }
             }
             return MappingEncoding(enumClass, directMapping, reverseMapping)
+        }
+
+        /**
+         * Creates an encoding for an [Enum] using its [name][Enum.name] as encoded form.
+         */
+        public inline fun <reified E : Enum<E>> enumByName(): Encoding<E, String> {
+            return enumByName(E::class)
+        }
+
+        public fun <E : Enum<E>> enumByName(enumClass: KClass<E>): Encoding<E, String> {
+            val javaClass = enumClass.java
+            return object : Encoding<E, String> {
+                override fun encode(value: E): String = value.name
+                override fun decode(value: String): E = java.lang.Enum.valueOf(javaClass, value)
+            }
         }
 
         /**
@@ -110,6 +133,11 @@ public interface Encoding<L, R> {
 
     }
 
+}
+
+private object IdentityEncoding : Encoding<Any?, Any?> {
+    override fun encode(value: Any?): Any? = value
+    override fun decode(value: Any?): Any? = value
 }
 
 private class MappingEncoding<E : Enum<E>, T>(

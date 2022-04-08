@@ -17,9 +17,9 @@ public sealed class Either<out L, out R> {
     // - Arrow's Either
     // - kotlin.Result
 
-    public data class Left<out L> internal constructor(val error: L) : Either<L, Nothing>()
+    public data class Left<out L>(val error: L) : Either<L, Nothing>()
 
-    public data class Right<out R> internal constructor(val value: R) : Either<Nothing, R>()
+    public data class Right<out R>(val value: R) : Either<Nothing, R>()
 
     public inline fun <T> fold(onFailure: (L) -> T, onSuccess: (R) -> T): T = when (this) {
         is Left -> onFailure(error)
@@ -72,4 +72,7 @@ public inline fun <L, R> Either<L, R>.getOrElse(transform: (L) -> R): R = when (
     is Right -> value
 }
 
-public fun <R> Either<*, R>.ensureSuccess(): R = getOrThrow { IllegalStateException("Result is error: $it") }
+public fun <R> Either<*, R>.checkRight(): R = getOrThrow { IllegalStateException("Result is error: $it") }
+
+@Deprecated("use checkRight()", ReplaceWith("checkRight()"))
+public fun <R> Either<*, R>.ensureSuccess(): R = checkRight()

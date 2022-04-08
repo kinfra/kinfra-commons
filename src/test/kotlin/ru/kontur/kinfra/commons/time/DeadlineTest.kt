@@ -1,10 +1,12 @@
 package ru.kontur.kinfra.commons.time
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.time.Duration
+import java.util.concurrent.TimeoutException
 
 class DeadlineTest {
 
@@ -46,6 +48,31 @@ class DeadlineTest {
         withDeadline(later) {
             withDeadline(earlier) {
                 assertThat(coroutineContext[Deadline]).isEqualTo(earlier)
+            }
+        }
+    }
+
+    @Test
+    fun withDeadline_return_value(): Unit = runBlocking {
+        val result = withDeadlineAfter(Duration.ofSeconds(1)) {
+            "foo"
+        }
+        assertThat(result).isEqualTo("foo")
+    }
+
+    @Test
+    fun withDeadline_return_null_value(): Unit = runBlocking {
+        val result = withDeadlineAfter<String?>(Duration.ofSeconds(1)) {
+            null
+        }
+        assertThat(result).isNull()
+    }
+
+    @Test
+    fun withDeadline_timeout(): Unit = runBlocking {
+        assertThrows<TimeoutException> {
+            withDeadlineAfter(Duration.ofMillis(1)) {
+                delay(2)
             }
         }
     }

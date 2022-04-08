@@ -1,12 +1,17 @@
 package ru.kontur.kinfra.commons.time
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.time.withTimeout
+import kotlinx.coroutines.time.withTimeoutOrNull
 import kotlinx.coroutines.withContext
 import ru.kontur.kinfra.commons.time.MonotonicInstant.Companion.now
 import java.time.Duration
 import java.time.temporal.ChronoUnit
+import java.util.*
+import java.util.concurrent.TimeoutException
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
 
@@ -96,18 +101,31 @@ public class Deadline private constructor(
 
 /**
  * Runs a given suspending [block] of code inside a coroutine with a specified [deadline][Deadline]
- * and throws a [TimeoutCancellationException] when the deadline passes.
+ * and throws a [TimeoutException] when the deadline passes.
  *
  * If current deadline is less than the specified one, it will be used instead.
  */
+@OptIn(ExperimentalContracts::class)
 public suspend fun <R> withDeadline(deadline: Deadline, block: suspend CoroutineScope.() -> R): R {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+
     val currentDeadline = coroutineContext[Deadline]
     val newDeadline = currentDeadline
         ?.let { minOf(it, deadline) }
         ?: deadline
 
-    return withTimeout(newDeadline.timeLeft()) {
-        withContext(newDeadline, block)
+    // withTimeout is not used because of https://github.com/Kotlin/kotlinx.coroutines/issues/1374
+    val timeout = newDeadline.timeLeft()
+    val result = withTimeoutOrNull(timeout) {
+        Optional.ofNullable(withContext(newDeadline, block))
+    }
+    if (result != null) {
+        // "unchecked" cast to nullable type
+        return result.orElse(null)
+    } else {
+        throw TimeoutException("Timed out waiting for ${timeout.toMillis()} ms")
     }
 }
 
@@ -117,7 +135,12 @@ public suspend fun <R> withDeadline(deadline: Deadline, block: suspend Coroutine
  * @see withDeadline
  * @see Deadline.after
  */
+@OptIn(ExperimentalContracts::class)
 public suspend fun <R> withDeadlineAfter(timeout: Duration, block: suspend CoroutineScope.() -> R): R {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+
     val deadline = Deadline.after(timeout)
     return withDeadline(deadline, block)
 }

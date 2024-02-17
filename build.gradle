@@ -1,19 +1,19 @@
 plugins {
-    id 'ru.kontur.library' version '5.8.4'
+    id 'java-library'
+    id 'maven-publish'
     id 'org.jetbrains.kotlin.jvm' version '1.5.31'
+    id 'ru.kontur.kinfra.presets' version '1.5'
 }
 
 ext {
-    release = '1.7'
-
     versions = [
-        assertj: '3.14.0',
+        assertj   : '3.14.0',
         coroutines: '1.4.3',
     ]
 }
 
 group = "ru.kontur.kinfra"
-version = buildVersion(release) { libraryDefaults() }
+version = "1.7"
 
 dependencies {
     implementation platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:${versions.coroutines}")
@@ -24,4 +24,25 @@ dependencies {
 
 kotlin {
     explicitApi()
+}
+
+jar {
+    manifest.attributes "Automatic-Module-Name": "ru.kontur.kinfra.commons"
+}
+
+publishing {
+    repositories {
+        def properties = project.properties
+        def repoUrl = properties["publishing.repo.url"]
+        if (repoUrl) {
+            maven {
+                url = repoUrl
+
+                credentials {
+                    username = properties["publishing.repo.username"]
+                    password = properties["publishing.repo.password"]
+                }
+            }
+        }
+    }
 }

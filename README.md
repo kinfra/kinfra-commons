@@ -3,6 +3,8 @@ kinfra-commons
 
 Общий вспомогательный код для библиотек и приложений на Kotlin.
 
+Maven `ru.kontur.kinfra:kinfra-commons`
+
 Описание возможностей
 ---------------------
 

@@ -3,6 +3,7 @@ plugins {
     id 'maven-publish'
     id 'org.jetbrains.kotlin.jvm' version '1.5.31'
     id 'ru.kontur.kinfra.presets' version '1.5'
+    id 'signing'
 }
 
 ext {
@@ -14,6 +15,7 @@ ext {
 
 group = "ru.kontur.kinfra"
 version = "1.7"
+archivesBaseName = "kinfra-commons"
 
 dependencies {
     implementation platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:${versions.coroutines}")
@@ -26,11 +28,50 @@ kotlin {
     explicitApi()
 }
 
+signing {
+    sign publishing.publications
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 jar {
     manifest.attributes "Automatic-Module-Name": "ru.kontur.kinfra.commons"
 }
 
 publishing {
+    publications{
+        maven(MavenPublication) {
+            pom {
+                name = 'kinfra-commons'
+                group = 'ru.kontur.kinfra'
+                artifactId = 'kinfra-commons'
+
+                description = 'Common utils for kinfra'
+                url = 'https://github.com/kinfra/kinfra-commons'
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'http://www.opensource.org/licenses/mit-license.php'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'frost13it'
+                        name = 'Vladimir Petrakovich'
+                        email = 'public@frostbit.tk'
+                    }
+                }
+                scm {
+                    connection = "scm:git:git://github.com:kinfra/kinfra-commons.git"
+                    developerConnection = 'scm:git:ssh://github.com:kinfra/kinfra-commons.git'
+                    url = 'https://github.com/kinfra/kinfra-commons'
+                }
+            }
+        }
+    }
     repositories {
         def properties = project.properties
         def repoUrl = properties["publishing.repo.url"]
